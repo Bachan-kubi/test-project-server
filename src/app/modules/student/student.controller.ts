@@ -50,7 +50,12 @@ const getAllStudents = async (req: Request, res: Response) => {
       msg: 'student collection created',
       data: result,
     });
-  } catch (error) {
+  } catch (error:any) {
+    res.status(500).json({
+      success: false,
+      msg: error.message || 'something wrong zod',
+      error: error,
+    });
     console.log(error);
   }
 };
@@ -65,10 +70,69 @@ const getSingleStudents = async (req: Request, res: Response) => {
       msg: 'single students got',
       data: result,
     });
-  } catch (error) {
+  } catch (error:any) {
+    res.status(500).json({
+      success: false,
+      msg: error.message || 'something wrong zod',
+      error: error,
+    });
     console.log(error);
   }
 };
+
+const deleteStudent = async(req: Request, res: Response)=>{
+  try {
+    const { studentId } = req.params;
+    // console.log(studentId);
+    const result = await studentServices.isDeleteStudentsFromDB(studentId);
+    res.status(200).json({
+      success: true,
+      msg: 'students deleted',
+      data: result,
+    });
+  } catch (error:any) {
+    res.status(500).json({
+      success: false,
+      msg: error.message || 'something wrong in deleting',
+      error: error,
+    });
+    console.log(error);
+  }
+};
+
+// update students
+const updateStudent = async (req: Request, res: Response)=>{
+  try {
+    // const {studentId, ...updateData} = req.params;
+    const {studentId} = req.params;
+    const updateData = req.body;
+    console.log(studentId, updateData);
+    const result = await studentServices.updateStudentFromDB(studentId, updateData);
+    // console.log(result);
+    res.status(200).json({
+      success: true,
+      msg: 'students updated',
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      msg: error.message || 'something wrong in updating',
+      error: error,
+    });
+  }
+}
+
+
+export const studentController = {
+  createStudent,
+  getAllStudents,
+  getSingleStudents,
+  deleteStudent, 
+  updateStudent
+  
+};
+
 
 
 // // normal validation below 
@@ -118,8 +182,10 @@ const getSingleStudents = async (req: Request, res: Response) => {
 // };
 
 
-export const studentController = {
-  createStudent,
-  getAllStudents,
-  getSingleStudents,
-};
+// export const studentController = {
+//   createStudent,
+//   getAllStudents,
+//   getSingleStudents,
+//   deleteStudent
+  
+// };

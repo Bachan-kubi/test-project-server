@@ -1,8 +1,14 @@
 import { Schema, model, connect } from 'mongoose';
-import { StudentMethod, StudentModel, TStudent, TUserName } from './student.interface';
+import {
+  StudentMethod,
+  StudentModel,
+  TStudent,
+  TUserName,
+} from './student.interface';
 import validator from 'validator';
 import bcrypt from 'bcrypt';
 import config from '../../config';
+import { func } from 'joi';
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -52,7 +58,11 @@ const localGuardianSchema = {
 
 const studentSchema = new Schema<TStudent, StudentModel, StudentMethod>({
   id: { type: String, required: true, unique: true },
-  password: { type: String, required: true, unique: true, maxlength:[20, 'your password less than 20'] },
+  password: {
+    type: String,
+    required: true,
+    maxlength: [20, 'your password less than 20'],
+  },
   name: {
     type: userNameSchema,
     required: true,
@@ -101,27 +111,61 @@ const studentSchema = new Schema<TStudent, StudentModel, StudentMethod>({
     enum: ['active', 'blocked'],
     default: 'active',
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
+}, {
+  toJSON: {virtuals: true}
 });
 
-// middleware 
-studentSchema.pre('save', async function(next){
+// middleware
+studentSchema.pre('save', async function (next) {
   // console.log(this, ' we will save pre hook')
   const user = this;
-  user.password = await bcrypt.hash(user.password, 
-    Number(config.bcrypt_salt_round));
-    next();
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_round),
+  );
+  next();
 });
 
-studentSchema.post('save', function(){
-  console.log(this, ' we saved pre hook')
+studentSchema.post('save', function (doc, next) {
+  // console.log(this, ' we saved pre hook')
+  console.log(doc);
+  // passwors should not be revealed, below process to protect
+  doc.password = '';
+  next();
 });
-// middleware 
+// query middlewaare
+studentSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+studentSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({$match: {isDeleted:{$ne: true}}});
+  next();
+});
+studentSchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+// middleware
+
+// mongoose virtual
+studentSchema.virtual("fullName").get(function(){
+  return(
+    `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`
+  )
+});
+// mongoose virtual
+
 
 // custom instance creation
-studentSchema.methods.isUserExist= async function(id:string){
-  const existingUser = await Student.findOne({id:id});
+studentSchema.methods.isUserExist = async function (id: string) {
+  const existingUser = await Student.findOne({ id: id });
   return existingUser;
-}
+};
 // customs instances
 
 // create model
