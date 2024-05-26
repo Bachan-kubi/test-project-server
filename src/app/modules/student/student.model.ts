@@ -1,4 +1,4 @@
-import { Schema, model, connect } from 'mongoose';
+import { Schema, model} from 'mongoose';
 import {
   StudentMethod,
   StudentModel,
@@ -57,7 +57,14 @@ const localGuardianSchema = {
 };
 
 const studentSchema = new Schema<TStudent, StudentModel, StudentMethod>({
-  id: { type: String, required: true, unique: true },
+  id: { type: String, required: [true, "ID is required"], unique: true },
+  user: {
+    type: Schema.Types.ObjectId,
+    required: [true, "User ID is required"],
+    ref: "Users",
+    unique: true
+
+  },
   password: {
     type: String,
     required: true,
@@ -106,11 +113,11 @@ const studentSchema = new Schema<TStudent, StudentModel, StudentMethod>({
     required: true,
   },
   profileImg: { type: String, required: true },
-  isActive: {
-    type: String,
-    enum: ['active', 'blocked'],
-    default: 'active',
-  },
+  // isActive: {
+  //   type: String,
+  //   enum: ['active', 'blocked'],
+  //   default: 'active',
+  // },
   isDeleted: {
     type: Boolean,
     default: false,

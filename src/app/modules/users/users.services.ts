@@ -1,10 +1,10 @@
 import config from "../../config";
-import { NewUser, TUsers } from "./users.interfce";
+import { TStudent } from "../student/student.interface";
+import { TUsers } from "./users.interfce";
 import { Users } from "./users.model";
 
-const createUsersIntoDB = async (student: TUsers, password: string) => {
-
-  const user: NewUser = {};
+const createUsersIntoDB = async (studentData: TStudent, password: string) => {
+  let userData: Partial<TUsers> = {};
     // const users = new Users(student);
     // const result = classStudent.save();
     // customs instance creation 
@@ -12,19 +12,31 @@ const createUsersIntoDB = async (student: TUsers, password: string) => {
     //   throw new Error("user already existed!")
     // }
 
-// if password is not given, use default password
-user.password = password || (config.default_password as string);
+// 01 if password is not given, use default password
+userData.password = password || (config.default_password as string);
 // if (!password){
 //   password = config.default_password as string;
 // }else{
 //   user.password = password;
 // }
-  user.role = 'student';
-// create users
-  const result = await Users.create(user);
-    return result;
-  };
+//02 set role
+userData.role = 'student';
+// 03 set id mannually
+userData.id = '12345678987';
 
+  
+// create users
+  const result = await Users.create(userData);
+    // return result;
+     // create student 
+ if(Object.keys(result).length){
+   studentData.id = result.id;
+   studentData.users = result._id;
+
+ }
+
+  };
+ 
 
   export const usersServices = {
     createUsersIntoDB,
