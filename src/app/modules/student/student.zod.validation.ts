@@ -28,6 +28,10 @@ const LocalGuardianValidatonSchema = z.object({
 // Define the student schema
 export const StudentValidationSchema = z.object({
   id: z.string(),
+  user: z.string({
+    required_error: "User ID is required",
+    invalid_type_error: "Name must be a string",
+  }),
   password: z.string().max(20),
   name: UserNameValidationSchema ,
   gender: z.enum(["Male", "Female", "Other"]),

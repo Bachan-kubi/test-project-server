@@ -61,15 +61,15 @@ const studentSchema = new Schema<TStudent, StudentModel, StudentMethod>({
   user: {
     type: Schema.Types.ObjectId,
     required: [true, "User ID is required"],
-    ref: "Users",
+    ref: "User",
     unique: true
 
   },
-  password: {
-    type: String,
-    required: true,
-    maxlength: [20, 'your password less than 20'],
-  },
+  // password: {
+  //   type: String,
+  //   required: true,
+  //   maxlength: [20, 'your password not more than 20'],
+  // },
   name: {
     type: userNameSchema,
     required: true,
@@ -127,23 +127,23 @@ const studentSchema = new Schema<TStudent, StudentModel, StudentMethod>({
 });
 
 // middleware
-studentSchema.pre('save', async function (next) {
-  // console.log(this, ' we will save pre hook')
-  const user = this;
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_round),
-  );
-  next();
-});
+// studentSchema.pre('save', async function (next) {
+//   // console.log(this, ' we will save pre hook')
+//   const user = this;
+//   user.password = await bcrypt.hash(
+//     user.password,
+//     Number(config.bcrypt_salt_round),
+//   );
+//   next();
+// });
 
-studentSchema.post('save', function (doc, next) {
-  // console.log(this, ' we saved pre hook')
-  console.log(doc);
-  // passwors should not be revealed, below process to protect
-  doc.password = '';
-  next();
-});
+// studentSchema.post('save', function (doc, next) {
+//   // console.log(this, ' we saved pre hook')
+//   console.log(doc);
+//   // passwors should not be revealed, below process to protect
+//   doc.password = '';
+//   next();
+// });
 // query middlewaare
 studentSchema.pre('find', function (next) {
   this.find({ isDeleted: { $ne: true } });

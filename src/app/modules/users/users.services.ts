@@ -1,9 +1,11 @@
 import config from "../../config";
 import { TStudent } from "../student/student.interface";
+import { Student } from "../student/student.model";
 import { TUsers } from "./users.interfce";
 import { Users } from "./users.model";
 
-const createUsersIntoDB = async (studentData: TStudent, password: string) => {
+const createStudentIntoDB = async (password: string, studentData: TStudent) => {
+  console.log(studentData, "student-serice");
   let userData: Partial<TUsers> = {};
     // const users = new Users(student);
     // const result = classStudent.save();
@@ -26,18 +28,17 @@ userData.id = '12345678987';
 
   
 // create users
-  const result = await Users.create(userData);
-    // return result;
+  const newUser = await Users.create(userData);
      // create student 
- if(Object.keys(result).length){
-   studentData.id = result.id;
-   studentData.users = result._id;
-
+ if(Object.keys(newUser).length){
+   studentData.id = newUser.id; // embedded id
+   studentData.user = newUser._id; // reference id
+   const newStudent = await Student.create(studentData);
+   return newStudent;
  }
-
   };
  
 
   export const usersServices = {
-    createUsersIntoDB,
+    createStudentIntoDB,
   }

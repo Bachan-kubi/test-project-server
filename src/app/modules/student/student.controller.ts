@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { studentServices } from './student.services';
 import { StudentValidationSchema } from './student.zod.validation';
 // import studentValidationSchema from './student.joi.validation';
 
-const createStudent = async (req: Request, res: Response) => {
+const createStudent = async (req: Request, res: Response, next: NextFunction) => {
   // will call  service func
   try {
     // 1. joi validation
@@ -32,13 +32,8 @@ const createStudent = async (req: Request, res: Response) => {
       msg: 'student collection created',
       data: result,
     });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      msg: error.message || 'something wrong zod',
-      error: error,
-    });
-    console.log(error);
+  } catch (error) {
+    next(error)
   }
 };
 
