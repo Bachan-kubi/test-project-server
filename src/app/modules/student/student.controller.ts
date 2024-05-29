@@ -4,7 +4,7 @@ import { StudentValidationSchema } from './student.zod.validation';
 // import studentValidationSchema from './student.joi.validation';
 
 const createStudent = async (req: Request, res: Response, next: NextFunction) => {
-  // will call  service func
+  // will call  service funckkk
   try {
     // 1. joi validation
     const { student: StudentData } = req.body;
